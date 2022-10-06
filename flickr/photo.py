@@ -1,9 +1,24 @@
 """Photo functions"""
 
 import logging
+import requests
 from flickr import api
 
 log = logging.getLogger(__name__)
+
+
+def download(photo_id):
+    """Download photo"""
+    details = get_info(photo_id)
+    datetaken = details['dates']['taken']
+    url = get_max_size_url(photo_id)
+    timestamp = f'{datetaken}'.replace(' ', '_').replace(':', '')
+    filename = f'{timestamp},{photo_id}.jpg'
+    log.info(f'Downloading {photo_id} {url}')
+    response = requests.get(url)
+    log.info(f'Saving {filename}')
+    with open(filename, 'wb') as file:
+        file.write(response.content)
 
 
 def get_info(photo_id):
