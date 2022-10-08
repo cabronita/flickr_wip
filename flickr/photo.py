@@ -26,8 +26,7 @@ def get_info(photo_id):
     log.info(f'Getting details of photo {photo_id}')
     payload = {
         'method': 'flickr.photos.getInfo',
-        'photo_id': photo_id,
-    }
+        'photo_id': photo_id}
     return api.call(payload)[0]
 
 
