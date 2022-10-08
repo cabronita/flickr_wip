@@ -26,3 +26,21 @@ def save_secrets(secrets):
     collection = client['apps']
     log.info('Saving secrets to database')
     collection.insert_one({'_id': 'flickr', 'secrets': secrets})
+
+
+def load_downloaded_photos():
+    client = get_client()
+    collection = client['downloaded']
+    photo_ids = []
+    for photo_id in collection.find():
+        photo_ids.append(photo_id['_id'])
+    return photo_ids
+
+
+def save_downloaded_photo(photo_id):
+    client = get_client()
+    collection = client['downloaded']
+    try:
+        collection.insert_one({'_id': photo_id})
+    except pymongo.errors.DuplicateKeyError:
+        log.info(f'{photo_id} already in database.')
