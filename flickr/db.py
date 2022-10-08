@@ -41,6 +41,6 @@ def save_downloaded_photo(photo_id):
     client = get_client()
     collection = client['downloaded']
     try:
-        collection.insert_one({'_id': photo_id})
+        collection.insert_one({'_id': int(photo_id)})
     except pymongo.errors.DuplicateKeyError:
         log.info(f'{photo_id} already in database.')
