@@ -39,7 +39,6 @@ def get_max_size_url(photo_id):
     log.info(f'Getting max size for {photo_id}')
     payload = {
         'method': 'flickr.photos.getSizes',
-        'photo_id': photo_id,
-    }
+        'photo_id': photo_id}
     sizes = api.call(payload)[0]['size']
     return sorted(sizes, key=lambda x: x['width'])[-1]['source']
