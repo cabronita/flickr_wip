@@ -1,9 +1,23 @@
 """User functions"""
 
 import logging
-from flickr import api
+from flickr import api, db
+from flickr.photo import save
 
 log = logging.getLogger(__name__)
+
+
+def download(user_id):
+    """Download user's photos"""
+    photos = get_photos(user_id)
+    downloaded_photos = db.load_downloaded_photos()
+    for photo in photos:
+        if int(photo['id']) in downloaded_photos:
+            log.info(f'Skipping download of {photo["id"]}')
+        else:
+            datetaken = photo['datetaken']
+            url = photo['url_o'] if 'url_o' in photo else None
+            save(datetaken, photo['id'], str(user_id), url)
 
 
 def get_id(username):

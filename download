@@ -1,0 +1,32 @@
+#!/usr/bin/env python3
+
+from argparse import ArgumentParser
+import logging
+import os
+import sys
+import flickr
+
+parser = ArgumentParser()
+parser.add_argument('ids', help='photoset or user IDs', nargs='+')
+parser.add_argument('-o', '--output', default='download', metavar='DIR', help='Output directory')
+parser.add_argument('-v', '--verbosity', action='count', default=0,
+                    help='increase output verbosity (-vv for debug)')
+args = parser.parse_args()
+ids = args.ids
+subdirectory = args.output
+
+logging_levels = [logging.WARNING, logging.INFO, logging.DEBUG]
+logging.basicConfig(level=logging_levels[args.verbosity])
+
+try:
+    os.chdir(subdirectory)
+except:
+    print(f'Unable to access {subdirectory}')
+    sys.exit(2)
+
+for id in ids:
+    logging.info(f'Processing {id}')
+    if '@' in id:
+        flickr.user.download(id)
+    else:
+        flickr.photoset.download(id)
