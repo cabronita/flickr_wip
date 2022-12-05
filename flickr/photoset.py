@@ -11,6 +11,8 @@ def download(photoset_id):
     """Download photos from photoset"""
     photos = get_photos(photoset_id)
     downloaded_photos = db.load_downloaded_photos()
+    if not photos:
+        return
     for photo in photos:
         if int(photo['id']) in downloaded_photos:
             log.info(f'Skipping download of {photo["id"]}')
@@ -28,7 +30,12 @@ def get_photos(photoset_id):
         'photoset_id': photoset_id}
     photos = []
     log.info(f'Getting photos in {photoset_id}')
-    for element in api.call(payload):
+    try:
+        api_call = api.call(payload)
+    except ValueError as e:
+        log.warning(f'{photoset_id} {e}')
+        return None
+    for element in api_call:
         for photo in element['photo']:
             photos.append(photo)
     return photos
