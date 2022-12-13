@@ -25,7 +25,6 @@ except:
     sys.exit(2)
 
 for id in ids:
-    print(f'Processing {id}')
     if '@' in id:
         flickr.user.download(id)
     else:

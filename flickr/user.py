@@ -9,6 +9,13 @@ log = logging.getLogger(__name__)
 
 def download(user_id):
     """Download user's photos"""
+    print(f"Processing {user_id}")
+    try:
+        profileurl = get_info(user_id)['profileurl']['_content']
+    except ValueError as e:
+        log.warning(f'{user_id} {e}')
+        return None
+    print(get_info(user_id)['profileurl']['_content'])
     photos = get_photos(user_id)
     downloaded_photos = db.load_downloaded_photos()
     for photo in photos:
@@ -29,17 +36,29 @@ def get_id(username):
     return api.call(payload)[0]['nsid']
 
 
+def get_info(user_id):
+    payload = {
+        'method': 'flickr.people.getInfo',
+        'user_id': user_id}
+    log.info(f'Getting info for user {user_id}')
+    return api.call(payload)[0]
+
+
 def get_photos(user_id):
     """Returns list of photo dicts"""
     payload = {
         'extras': 'date_taken, tags, title, url_o, url_q, views',
         'method': 'flickr.photos.search',
         'user_id': user_id}
-    photos = []
     log.info(f'Getting photos for user {user_id}')
-    for response in api.call(payload):
-        for photo in response['photo']:
-            photos.append(photo)
+    try:
+        response = api.call(payload)
+    except ValueError as e:
+        log.warning(f'{user_id} {e}')
+        return None
+    photos = []
+    for photo in response[0]['photo']:
+        photos.append(photo)
     return photos
 
 
@@ -51,7 +70,8 @@ def get_photosets(user_id):
     }
     data = []
     log.info(f'Getting photosets for user {user_id}')
-    for photosets in api.call(payload):
+    response = api.call(payload)
+    for photosets in response:
         for photoset in photosets['photoset']:
             data.append(photoset)
     return data
